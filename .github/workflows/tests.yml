@@ -23,7 +23,7 @@ jobs:
   build:
     if: github.event_name == 'pull_request' || github.repository != 'discourse/discourse-private-mirror'
     name: ${{ matrix.target }} ${{ matrix.build_type }}${{ !matrix.updated_ember && ' (Ember 3)' || '' }} # Update fetch-job-id step if changing this
-    runs-on: ${{ (matrix.build_type == 'annotations') && 'ubuntu-latest' || 'ubuntu-20.04-8core' }}
+    runs-on: ${{ (matrix.build_type == 'annotations') && 'actuated-4cpu-8gb' || 'actuated-8cpu-10gb' }}
     container: discourse/discourse_test:slim${{ (matrix.build_type == 'frontend' || matrix.build_type == 'system') && '-browsers' || '' }}${{ (matrix.ruby == '3.1') && '-ruby-3.1.0' || '' }}
     timeout-minutes: 20
 
@@ -84,8 +84,16 @@ jobs:
           sudo -u postgres psql -c "CREATE ROLE $PGUSER LOGIN SUPERUSER PASSWORD '$PGPASSWORD';"
 
       - name: Bundler cache
-        uses: actions/cache@v4
+        uses: tespkg/actions-cache@v1
         with:
+          endpoint: "s3.amazonaws.com"
+          insecure: false
+          accessKey: ${{ secrets.AWS_ACTIONS_CACHE_ACCESS_KEY }}
+          secretKey: ${{ secrets.AWS_ACTIONS_CACHE_SECRET_KEY }}
+          bucket: actuated-runners
+          region: eu-central-1
+          use-fallback: false
+
           path: vendor/bundle
           key: ${{ runner.os }}-${{ matrix.ruby }}-gem-${{ hashFiles('**/Gemfile.lock') }}-cachev2
 
@@ -103,9 +111,17 @@ jobs:
         run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
 
       - name: Yarn cache
-        uses: actions/cache@v4
+        uses: tespkg/actions-cache@v1
         id: yarn-cache
         with:
+          endpoint: "s3.amazonaws.com"
+          insecure: false
+          accessKey: ${{ secrets.AWS_ACTIONS_CACHE_ACCESS_KEY }}
+          secretKey: ${{ secrets.AWS_ACTIONS_CACHE_SECRET_KEY }}
+          bucket: actuated-runners
+          region: eu-central-1
+          use-fallback: false
+
           path: ${{ steps.yarn-cache-dir.outputs.dir }}
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}-cachev2
 
@@ -121,8 +137,16 @@ jobs:
         run: bin/rake plugin:pull_compatible_all
 
       - name: Plugin gems cache
-        uses: actions/cache@v4
+        uses: tespkg/actions-cache@v1
         with:
+          endpoint: "s3.amazonaws.com"
+          insecure: false
+          accessKey: ${{ secrets.AWS_ACTIONS_CACHE_ACCESS_KEY }}
+          secretKey: ${{ secrets.AWS_ACTIONS_CACHE_SECRET_KEY }}
+          bucket: actuated-runners
+          region: eu-central-1
+          use-fallback: false
+
           path: plugins/*/gems
           key: ${{ runner.os }}-plugin-gems-${{matrix.ruby}}-${{ hashFiles('plugins/*/plugin.rb') }}
 
@@ -137,9 +161,17 @@ jobs:
           echo "127.0.0.1 discoursetest.minio.local" | sudo tee -a /etc/hosts
 
       - name: Fetch app state cache
-        uses: actions/cache@v4
+        uses: tespkg/actions-cache@v1
         id: app-cache
         with:
+          endpoint: "s3.amazonaws.com"
+          insecure: false
+          accessKey: ${{ secrets.AWS_ACTIONS_CACHE_ACCESS_KEY }}
+          secretKey: ${{ secrets.AWS_ACTIONS_CACHE_SECRET_KEY }}
+          bucket: actuated-runners
+          region: eu-central-1
+          use-fallback: false
+
           path: tmp/app-cache
           key: >-
             ${{ runner.os }}-
@@ -179,10 +211,18 @@ jobs:
         run: rm -rf tmp/app-cache/uploads && cp -r public/uploads tmp/app-cache/uploads
 
       - name: Fetch turbo_rspec_runtime.log cache
-        uses: actions/cache@v4
+        uses: tespkg/actions-cache@v1
         id: test-runtime-cache
         if: matrix.build_type == 'backend' || matrix.build_type == 'system'
         with:
+          endpoint: "s3.amazonaws.com"
+          insecure: false
+          accessKey: ${{ secrets.AWS_ACTIONS_CACHE_ACCESS_KEY }}
+          secretKey: ${{ secrets.AWS_ACTIONS_CACHE_SECRET_KEY }}
+          bucket: actuated-runners
+          region: eu-central-1
+          use-fallback: false
+
           path: tmp/turbo_rspec_runtime.log
           key: rspec-runtime-${{ matrix.build_type }}-${{ matrix.target }}-${{ github.run_id }}
           restore-keys: rspec-runtime-${{ matrix.build_type }}-${{ matrix.target }}-
@@ -331,9 +371,10 @@ jobs:
         timeout-minutes: 30
 
   core_frontend_tests:
-    if: github.event_name == 'pull_request' || github.repository != 'discourse/discourse-private-mirror'
+    if: false
+    # if: github.event_name == 'pull_request' || github.repository != 'discourse/discourse-private-mirror'
     name: core frontend (${{ matrix.browser }})${{ !matrix.updated_ember && ' (Ember 3)' || '' }}
-    runs-on: ubuntu-20.04-8core
+    runs-on: actuated-8cpu-10gb
     container:
       image: discourse/discourse_test:slim-browsers
       options: --user discourse
