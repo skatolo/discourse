@@ -86,13 +86,12 @@ jobs:
       - name: Bundler cache
         uses: tespkg/actions-cache@v1
         with:
-          endpoint: "192.168.128.1"
-          port: 8333
-          insecure: true
-          accessKey: ${{ secrets.ACTIONS_CACHE_ACCESS_KEY }}
-          secretKey: ${{ secrets.ACTIONS_CACHE_SECRET_KEY }}
+          endpoint: "s3.amazonaws.com"
+          insecure: false
+          accessKey: ${{ secrets.AWS_ACTIONS_CACHE_ACCESS_KEY }}
+          secretKey: ${{ secrets.AWS_ACTIONS_CACHE_SECRET_KEY }}
           bucket: actuated-runners
-          region: local
+          region: eu-central-1
           use-fallback: false
 
           path: vendor/bundle
@@ -115,13 +114,12 @@ jobs:
         uses: tespkg/actions-cache@v1
         id: yarn-cache
         with:
-          endpoint: "192.168.128.1"
-          port: 8333
-          insecure: true
-          accessKey: ${{ secrets.ACTIONS_CACHE_ACCESS_KEY }}
-          secretKey: ${{ secrets.ACTIONS_CACHE_SECRET_KEY }}
+          endpoint: "s3.amazonaws.com"
+          insecure: false
+          accessKey: ${{ secrets.AWS_ACTIONS_CACHE_ACCESS_KEY }}
+          secretKey: ${{ secrets.AWS_ACTIONS_CACHE_SECRET_KEY }}
           bucket: actuated-runners
-          region: local
+          region: eu-central-1
           use-fallback: false
 
           path: ${{ steps.yarn-cache-dir.outputs.dir }}
@@ -141,13 +139,12 @@ jobs:
       - name: Plugin gems cache
         uses: tespkg/actions-cache@v1
         with:
-          endpoint: "192.168.128.1"
-          port: 8333
-          insecure: true
-          accessKey: ${{ secrets.ACTIONS_CACHE_ACCESS_KEY }}
-          secretKey: ${{ secrets.ACTIONS_CACHE_SECRET_KEY }}
+          endpoint: "s3.amazonaws.com"
+          insecure: false
+          accessKey: ${{ secrets.AWS_ACTIONS_CACHE_ACCESS_KEY }}
+          secretKey: ${{ secrets.AWS_ACTIONS_CACHE_SECRET_KEY }}
           bucket: actuated-runners
-          region: local
+          region: eu-central-1
           use-fallback: false
 
           path: plugins/*/gems
@@ -167,13 +164,12 @@ jobs:
         uses: tespkg/actions-cache@v1
         id: app-cache
         with:
-          endpoint: "192.168.128.1"
-          port: 8333
-          insecure: true
-          accessKey: ${{ secrets.ACTIONS_CACHE_ACCESS_KEY }}
-          secretKey: ${{ secrets.ACTIONS_CACHE_SECRET_KEY }}
+          endpoint: "s3.amazonaws.com"
+          insecure: false
+          accessKey: ${{ secrets.AWS_ACTIONS_CACHE_ACCESS_KEY }}
+          secretKey: ${{ secrets.AWS_ACTIONS_CACHE_SECRET_KEY }}
           bucket: actuated-runners
-          region: local
+          region: eu-central-1
           use-fallback: false
 
           path: tmp/app-cache
@@ -219,13 +215,12 @@ jobs:
         id: test-runtime-cache
         if: matrix.build_type == 'backend' || matrix.build_type == 'system'
         with:
-          endpoint: "192.168.128.1"
-          port: 8333
-          insecure: true
-          accessKey: ${{ secrets.ACTIONS_CACHE_ACCESS_KEY }}
-          secretKey: ${{ secrets.ACTIONS_CACHE_SECRET_KEY }}
+          endpoint: "s3.amazonaws.com"
+          insecure: false
+          accessKey: ${{ secrets.AWS_ACTIONS_CACHE_ACCESS_KEY }}
+          secretKey: ${{ secrets.AWS_ACTIONS_CACHE_SECRET_KEY }}
           bucket: actuated-runners
-          region: local
+          region: eu-central-1
           use-fallback: false
 
           path: tmp/turbo_rspec_runtime.log
