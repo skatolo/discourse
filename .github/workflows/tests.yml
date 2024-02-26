@@ -23,7 +23,7 @@ jobs:
   build:
     if: github.event_name == 'pull_request' || github.repository != 'discourse/discourse-private-mirror'
     name: ${{ matrix.target }} ${{ matrix.build_type }}${{ !matrix.updated_ember && ' (Ember 3)' || '' }} # Update fetch-job-id step if changing this
-    runs-on: ${{ (matrix.build_type == 'annotations') && 'actuated-4cpu-8gb' || 'actuated-8cpu-10gb' }}
+    runs-on: [${{ (matrix.build_type == 'annotations') && 'actuated-4cpu-8gb' || 'actuated-8cpu-10gb' }}, a102]
     container: discourse/discourse_test:slim${{ (matrix.build_type == 'frontend' || matrix.build_type == 'system') && '-browsers' || '' }}${{ (matrix.ruby == '3.1') && '-ruby-3.1.0' || '' }}
     timeout-minutes: 20
 
